@@ -22,7 +22,7 @@ It supports only *.mp4 files right now.
 
 ## createIndex.sh
 
-The bash scripts generates all preview files for a directory and creates a summary metadata file `combined_index.json` at the end.
+The bash scripts generates all preview files for a directory unsing the `converts.sh` and creates a summary metadata file `combined_index.json` at the end. 
 
     Usage: ./createIndex.sh <directory_path>
 
