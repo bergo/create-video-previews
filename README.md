@@ -25,3 +25,5 @@ It supports only *.mp4 files right now.
 The bash scripts generates all preview files for a directory and creates a summary metadata file `combined_index.json` at the end.
 
     Usage: ./createIndex.sh <directory_path>
+
+The variables for the generation can be adjusted at the beginning of the script.
