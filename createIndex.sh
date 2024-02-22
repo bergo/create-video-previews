@@ -1,11 +1,69 @@
 #!/bin/bash
 
 # variables for the preview creation
-video_width=640
-video_height=360
+video_width=1280
+video_height=720
 scene_length=1.1
 num_scenes=12
-force="-f" # use -f to force the creation of a new preview
+force="" # use -f to force the creation of a new preview
+remove_audio="" # by default remove audio
+
+usage() {
+  echo
+  echo "Create preview and index file for each video in the folder and a combined index for the whole folder."
+  echo
+  echo "Usage: $0 [options] <video_directory_path>"
+  echo
+  echo "Options:"
+  echo "  -f, --force              Force the creation of a new preview."
+  echo "  -n, --scenes NUMBER      Set the number of scenes (default 10)."
+  echo "  -l, --length SECONDS     Set the length of each scene in seconds (default 5)."
+  echo "  -w, --width  MAX_WIDTH   Maximum width of the preview (default: 1280)"
+  echo "  -d, --height MAX_HEIGHT  Maximum height of the preview (default: 720)"
+  echo "  -a, --use_audio          Set to keep audio in the preview (default: remove audio)"
+  echo "  -h, --help               Display this help message and exit."
+  echo "  <video_directory_path>   The input video directory to process"
+  exit 1
+}
+
+if [ "$#" -lt 1 ]; then
+    usage
+fi
+
+# Parse command line arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+    -f|--force)
+      force="-f"
+      ;;
+    -n|--scenes)
+      num_scenes=$2 ; shift
+      ;;
+    -l|--length)
+      scene_length=$2 ; shift
+      ;;
+    -w|--width) 
+      video_width="$2" ; shift
+      ;;
+    -d|--height) 
+      video_height="$2" ; shift 
+      ;;
+    -a|--use_audio) 
+      remove_audio="-a"
+      ;;
+    -h|--help)
+      usage
+      ;;
+    --) shift; break ;;  # End of options
+    -*|--*=)  # Unsupported flags
+        echo "Error: Unsupported flag $1" >&2
+        usage
+        ;;
+    *) break ;;  # End of options, start of positional arguments
+  esac
+  shift
+done
+
 
 # Check if the correct number of arguments is given
 if [ "$#" -ne 1 ]; then
@@ -36,7 +94,7 @@ for file in *.mp4; do
     # Ensure that it's a file
     if [ -f "$file" ]; then
         echo "Processing $file"
-        "$workDirectory"/convert.sh -w $video_width -d $video_height -l $scene_length -n $num_scenes $force "$file"
+        "$workDirectory"/convert.sh -w $video_width -d $video_height -l $scene_length -n $num_scenes $force $remove_audio "$file"
     fi
 done
 
