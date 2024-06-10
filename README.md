@@ -12,6 +12,7 @@ It supports only *.mp4 files right now.
 
     Options:
     -f, --force              Force the creation of a new preview.
+    -o, --folder FOLDER      Set the target folder (default is current dir).
     -n, --scenes NUMBER      Set the number of scenes (default 10).
     -l, --length SECONDS     Set the length of each scene in seconds (default 5).
     -w, --width  MAX_WIDTH   Maximum width of the preview (default: 1280)
