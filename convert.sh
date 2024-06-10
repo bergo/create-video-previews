@@ -7,12 +7,14 @@ scene_length=2
 max_width=1280
 max_height=720
 remove_audio=1 # by default remove audio
+target_folder=""
 
 usage() {
   echo "Usage: $0 [options] <video_file>"
   echo
   echo "Options:"
   echo "  -f, --force              Force the creation of a new preview."
+  echo "  -o, --folder FOLDER      Set the target folder (default is current dir)."
   echo "  -n, --scenes NUMBER      Set the number of scenes (default 10)."
   echo "  -l, --length SECONDS     Set the length of each scene in seconds (default 5)."
   echo "  -w, --width  MAX_WIDTH   Maximum width of the preview (default: 1280)"
@@ -32,6 +34,9 @@ while [[ "$#" -gt 0 ]]; do
     case $1 in
     -f|--force)
       force=1
+      ;;
+    -o|--folder)
+      target_folder="$2" ; shift
       ;;
     -n|--scenes)
       num_scenes=$2 ; shift
@@ -69,10 +74,30 @@ if [ -z "$#" ]; then
   usage
 fi
 
+# Ensure the variable has a trailing slash
+if [[ -n "$target_folder" ]]; then
+  if [[ "$target_folder" != */ ]]; then
+      target_folder="${target_folder}/"
+  fi
+fi
+
+# Check if the folder exists
+if [ -d "$target_folder" ]; then
+    echo "Folder exists."
+else
+    echo "Folder does not exist. Attempting to create it."
+    if mkdir -p "$target_folder"; then
+        echo "Folder created successfully."
+    else
+        echo "Failed to create the folder."
+        usage
+    fi
+fi
+
 video_file="$1"
-preview_file="${video_file%.*}_preview.mp4"
-thumbnail_filename="${video_file%.*}.png"
-meta_file="${video_file%.*}_meta.json"
+preview_file="${target_folder}${video_file%.*}_preview.mp4"
+thumbnail_filename="${target_folder}${video_file%.*}.png"
+meta_file="${target_folder}${video_file%.*}_meta.json"
 
 
 if [ ! -f "$video_file" ]; then

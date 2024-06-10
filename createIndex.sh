@@ -7,6 +7,7 @@ scene_length=1.1
 num_scenes=12
 force="" # use -f to force the creation of a new preview
 remove_audio="" # by default remove audio
+target_folder=""
 
 usage() {
   echo
@@ -16,6 +17,7 @@ usage() {
   echo
   echo "Options:"
   echo "  -f, --force              Force the creation of a new preview."
+  echo "  -o, --folder FOLDER      Set the target folder (default is current dir)."
   echo "  -n, --scenes NUMBER      Set the number of scenes (default 10)."
   echo "  -l, --length SECONDS     Set the length of each scene in seconds (default 5)."
   echo "  -w, --width  MAX_WIDTH   Maximum width of the preview (default: 1280)"
@@ -33,40 +35,45 @@ fi
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-    -f|--force)
-      force="-f"
-      ;;
-    -n|--scenes)
-      num_scenes=$2 ; shift
-      ;;
-    -l|--length)
-      scene_length=$2 ; shift
-      ;;
-    -w|--width) 
-      video_width="$2" ; shift
-      ;;
-    -d|--height) 
-      video_height="$2" ; shift 
-      ;;
-    -a|--use_audio) 
-      remove_audio="-a"
-      ;;
-    -h|--help)
-      usage
-      ;;
-    --) shift; break ;;  # End of options
-    -*|--*=)  # Unsupported flags
-        echo "Error: Unsupported flag $1" >&2
+      -f|--force)
+        force="-f"
+        ;;
+      -o|--folder)
+        target_folder="$2" ; shift
+        ;;
+      -n|--scenes)
+        num_scenes=$2 ; shift
+        ;;
+      -l|--length)
+        scene_length=$2 ; shift
+        ;;
+      -w|--width)
+        video_width="$2" ; shift
+        ;;
+      -d|--height)
+        video_height="$2" ; shift
+        ;;
+      -a|--use_audio)
+        remove_audio="-a"
+        ;;
+      -h|--help)
         usage
         ;;
-    *) break ;;  # End of options, start of positional arguments
-  esac
+      --) shift; break ;;  # End of options
+      -*|--*=)  # Unsupported flags
+          echo "Error: Unsupported flag $1" >&2
+          usage
+          ;;
+      *) break ;;  # End of options, start of positional arguments
+    esac
+  echo $1
   shift
+
 done
 
-
 # Check if the correct number of arguments is given
-if [ "$#" -ne 1 ]; then
+#if [ "$#" -ne 1 ]; then
+if [ -z "$#" ]; then
   echo "Usage: $0 <directory_path>"
   exit 1
 fi
@@ -94,7 +101,7 @@ for file in *.mp4; do
     # Ensure that it's a file
     if [ -f "$file" ]; then
         echo "Processing $file"
-        "$workDirectory"/convert.sh -w $video_width -d $video_height -l $scene_length -n $num_scenes $force $remove_audio "$file"
+        "$workDirectory"/convert.sh -o "$target_folder" -w $video_width -d $video_height -l $scene_length -n $num_scenes $force $remove_audio "$file"
     fi
 done
 
@@ -102,7 +109,7 @@ done
 # combine all JSON files in a directory into a single JSON file.
 
 # The output JSON file
-outputFile="combined_index.json"
+outputFile="${target_folder}combined_index.json"
 
 output_json_file="$outputFile"
 # Start of the JSON array
@@ -112,7 +119,7 @@ echo "{ \"files\": [" > "$output_json_file"
 first=true
 
 # Loop through the json files in the directory
-for json_file in *_meta.json; do
+for json_file in ${target_folder}*_meta.json; do
     if [ "$first" = true ]; then
         first=false
     else
