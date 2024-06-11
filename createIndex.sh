@@ -86,7 +86,7 @@ if [ ! -d "$directory" ]; then
 fi
 
 # The work directory containing all files
-workDirectory=$(pwd)
+workDirectory=$(dirname "$(realpath "$0")")
 echo "Work directory: $workDirectory"
 echo "File directory: $directory"
 
